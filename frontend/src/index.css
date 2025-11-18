@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+/*
+	Custom animations and utility classes to complement Tailwind.
+	These are lightweight, focused styles used across components for
+	animations (fade/slide/shimmer), and small utility classes (input, btn-primary, card, stat-card).
+*/
+
+/* Fade in quickly */
+@keyframes fadeIn {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+/* Slide from right with fade */
+@keyframes slideInRight {
+	from { transform: translateX(12px); opacity: 0; }
+	to { transform: translateX(0); opacity: 1; }
+}
+
+/* Slide from bottom with fade */
+@keyframes slideInUp {
+	from { transform: translateY(10px); opacity: 0; }
+	to { transform: translateY(0); opacity: 1; }
+}
+
+/* Subtle attention pulse */
+@keyframes subtlePulse {
+	0% { transform: scale(1); }
+	50% { transform: scale(1.02); }
+	100% { transform: scale(1); }
+}
+
+/* Shimmer for skeletons */
+@keyframes shimmer {
+	0% { background-position: -200px 0; }
+	100% { background-position: calc(200px + 100%) 0; }
+}
+
+.animate-fadeIn { animation: fadeIn 0.3s ease-in both; }
+.animate-slideInRight { animation: slideInRight 0.4s cubic-bezier(.2,.9,.2,1) both; }
+.animate-slideInUp { animation: slideInUp 0.45s cubic-bezier(.2,.9,.2,1) both; }
+.animate-pulse-subtle { animation: subtlePulse 1s ease-in-out infinite; }
+
+/* Shimmer skeleton utility */
+.skeleton {
+	background: linear-gradient(90deg, #f3f4f6 25%, #e6eefc 37%, #f3f4f6 63%);
+	background-size: 400% 100%;
+	animation: shimmer 1.5s linear infinite;
+}
+
+/* Form input base styling used across components */
+.input {
+	@apply border border-slate-200 rounded-md px-3 py-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-shadow duration-150;
+}
+
+/* Primary gradient button */
+.btn-primary {
+	@apply inline-flex items-center justify-center px-4 py-2 rounded-md text-white font-medium shadow-md;
+	background-image: linear-gradient(90deg,#6366f1 0%,#8b5cf6 50%,#ec4899 100%);
+	transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(99,102,241,0.12); }
+.btn-primary:disabled { opacity: .6; transform: none; box-shadow: none; }
+
+/* Secondary outline button */
+.btn-secondary {
+	@apply inline-flex items-center justify-center px-3 py-1.5 rounded-md text-sm font-medium border border-slate-200;
+	transition: background .12s ease, color .12s ease;
+}
+.btn-secondary:hover { background: rgba(99,102,241,0.06); }
+
+/* Card base */
+.card {
+	@apply bg-white rounded-lg shadow-md p-4 transition-transform duration-150;
+}
+.card:hover { transform: translateY(-4px); }
+
+/* Stat cards with colorful gradients (use alongside Tailwind utilities) */
+.stat-card { @apply text-white rounded-lg shadow-lg p-4 transition-transform duration-150; }
+.stat-card:hover { transform: translateY(-6px); }
+
+/* small utility to make gradient text */
+.gradient-text {
+	background: linear-gradient(90deg,#6366f1,#8b5cf6,#ec4899);
+	-webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+/* make sure interactive elements get smooth transitions */
+a, button, input, .input, .btn-primary, .btn-secondary { transition: all .15s ease-in-out; }
