@@ -1,4 +1,3 @@
-// db.js - small wrapper using better-sqlite3
 const Database = require('better-sqlite3');
 const fs = require('fs');
 const path = require('path');
@@ -9,7 +8,6 @@ if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
 const db = new Database(DB_PATH);
 
-// initialize table if not exists
 db.prepare(`
   CREATE TABLE IF NOT EXISTS links (
     code TEXT PRIMARY KEY,

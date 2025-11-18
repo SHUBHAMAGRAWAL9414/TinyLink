@@ -7,9 +7,6 @@ function truncate(s, n=60){ return s.length > n ? s.slice(0,n-3)+'...' : s; }
 export default function LinkRow({ row, onDelete }) {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
-  // Prefer the backend API base (set via Vite env VITE_API_BASE) so short links
-  // point to the backend domain which handles server-side redirects. Fallback
-  // to the current origin when the env variable is not set (local dev).
   const apiBase = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) || window.location.origin;
   const short = `${apiBase.replace(/\/$/, '')}/${row.code}`;
 

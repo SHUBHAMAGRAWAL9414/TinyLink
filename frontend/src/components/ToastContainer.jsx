@@ -2,10 +2,6 @@ import React, { useCallback, useMemo, useState } from 'react';
 import Toast from './Toast';
 import ToastContext from './ToastContext';
 
-// Simple Toast system using React Context.
-// Usage:
-// Wrap your app with <ToastProvider> and call const { toast } = useToast(); toast('Hi', 'success')
-
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
 
@@ -24,7 +20,6 @@ export function ToastProvider({ children }) {
   return (
     <ToastContext.Provider value={value}>
       {children}
-      {/* Toast stack: positioned top-right */}
       <div className="fixed top-4 right-4 z-50 flex flex-col gap-3 items-end">
         {toasts.map(t => (
           <Toast key={t.id} id={t.id} message={t.message} type={t.type} duration={t.duration} onClose={remove} />

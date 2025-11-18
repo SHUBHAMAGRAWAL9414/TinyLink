@@ -1,11 +1,5 @@
 import React, { useEffect } from 'react';
 
-// Simple Toast component that slides in from the top-right and auto-dismisses.
-// Props:
-// - message: string to display
-// - type: 'success' | 'error' | 'info' (controls gradient)
-// - onClose: callback to remove the toast
-// - duration: milliseconds before auto-dismiss (optional, default 3000)
 export default function Toast({ id, message, type = 'info', onClose, duration = 3000 }) {
   useEffect(() => {
     const t = setTimeout(() => onClose && onClose(id), duration);
