@@ -12,20 +12,17 @@ const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 
 const app = express();
 app.use(helmet());
-const allowedOrigins = [
-    "https://tiny-link-omega.vercel.app"
-];
 
-app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error("Not allowed by CORS"));
-        }
-    },
-    credentials: true
-}));
+app.use(
+  cors({
+    origin: process.env.BASE_URL,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  })
+);
+
+
 app.use(express.json());
 
 app.get('/healthz', (req, res) => {
