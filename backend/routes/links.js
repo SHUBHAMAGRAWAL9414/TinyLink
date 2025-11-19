@@ -1,17 +1,3 @@
-/**
- * Router: /api/links
- *
- * This module provides CRUD endpoints for shortened links backed by MongoDB.
- * - GET  /        -> list all links
- * - POST /        -> create a new link (optional custom code)
- * - GET  /:code   -> get stats for a single link
- * - DELETE /:code -> delete a link
- *
- * Notes:
- * - Codes are validated by `CODE_REGEX` (6-8 alphanumeric characters).
- * - Database operations are performed via the `backend/db.js` abstraction
- *   which returns plain JS objects (it uses `.lean()` where appropriate).
- */
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
@@ -55,11 +41,6 @@ router.post('/', async (req, res) => {
     const created = await db.getLink(code);
     res.status(201).json(created);
   } catch (err) {
-    // Database errors during creation can happen for reasons including
-    // validation or unique index violations. Specifically, a race can occur
-    // where `codeExists` returns false but another concurrent insert creates
-    // the same code before `createLink()` runs. In that case MongoDB will
-    // throw a duplicate-key error (E11000) which we map to HTTP 409.
     console.error('Database error:', err);
     // Detect MongoDB duplicate key error for the `code` field (E11000).
     const isDup = err && (err.code === 11000 || (err.message && err.message.includes && err.message.includes('E11000') && err.message.includes('code')));

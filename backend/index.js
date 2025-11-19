@@ -9,7 +9,7 @@ const linksRouter = require('./routes/links');
 const connectDB = require('./config/database');
 
 const PORT = process.env.PORT || 4000;
-const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
+const BASE_URL = process.env.BASE_URL;
 
 const app = express();
 app.use(helmet());
