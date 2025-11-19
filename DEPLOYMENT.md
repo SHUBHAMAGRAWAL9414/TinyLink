@@ -33,14 +33,12 @@ This section shows how to deploy the backend to Render. You can follow similar s
    - Start command: `npm start`
 3. Environment variables
    - Add the variables from `backend/.env.example`:
-     - `PORT` — typically left empty for Render (Render supplies a port via $PORT)
-     - `BASE_URL` — the full URL Render assigns to your service (e.g., `https://your-backend.onrender.com`)
-     - `DATABASE_FILE` — e.g., `./data/tinylink.db`
-     - `NODE_ENV=production`
-   - Ensure you create the `data/` directory or configure a persistent disk (see below)
+      - `PORT` — typically left empty for Render (Render supplies a port via $PORT)
+      - `BASE_URL` — the full URL Render assigns to your service (e.g., `https://your-backend.onrender.com`)
+      - `NODE_ENV=production`
 4. Database persistence
-   - This project now uses MongoDB (Atlas or self-hosted) as the primary data store. The legacy SQLite `data/` folder has been removed from the repository and is intentionally ignored by `.gitignore` to avoid accidental commits of binary DB files.
-   - If you previously relied on the SQLite file, migrate your data to MongoDB before removing local artifacts.
+   - This project uses MongoDB (Atlas or self-hosted) as the primary data store. The legacy SQLite `data/` folder and `.db` artifacts have been removed from the repository to avoid confusion.
+   - If you previously relied on a local SQLite file, migrate your data to MongoDB before removing local artifacts.
 5. Deploy and verify
    - Deploy the service and copy the public URL. Use this value as `BASE_URL` and for the frontend's `VITE_API_BASE`.
 
@@ -75,14 +73,14 @@ This section shows how to deploy the backend to Render. You can follow similar s
 Backend (`backend/.env`):
 - `PORT` — port number (default 4000). Hosting platforms usually provide this automatically.
 - `BASE_URL` — full public URL for your backend (e.g., `https://your-backend.onrender.com`). Used for constructing links.
-- `DATABASE_FILE` — path to SQLite DB, e.g., `./data/tinylink.db`
+- `MONGODB_URI` — MongoDB connection string (required). Example: `mongodb+srv://user:pass@cluster0.mongodb.net/tinylink?retryWrites=true&w=majority`
 - `NODE_ENV` — `production` for deployed services
 
 Frontend (`frontend/.env`):
 - `VITE_API_BASE` — backend API base (no trailing slash). Example: `https://your-backend.onrender.com`
 
 Example local values (for testing):
-- Backend: `BASE_URL=http://localhost:4000`, `DATABASE_FILE=./data/tinylink.db`, `NODE_ENV=development`
+- Backend: `BASE_URL=http://localhost:4000`, `MONGODB_URI=mongodb://localhost:27017/tinylink`, `NODE_ENV=development`
 - Frontend: `VITE_API_BASE=http://localhost:4000`
 
 ---
