@@ -1,4 +1,4 @@
 node_modules
 .env
-data/
-*.db
+// Note: SQLite artifacts were removed during migration to MongoDB.
+# Keep only essential ignores. Do not ignore `.env.example` so it can be committed.
