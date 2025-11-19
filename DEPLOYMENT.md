@@ -6,7 +6,7 @@ This guide walks you through deploying the TinyLink app (Frontend + Backend). It
 
 Architecture:
 - Frontend: React + Vite + Tailwind (folder: `frontend`) — deploy to Vercel
-- Backend: Node + Express + SQLite (folder: `backend`) — deploy to Render or Railway
+- Backend: Node + Express + MongoDB (folder: `backend`) — deploy to Render or Railway
 
 Prerequisites:
 - GitHub account (to connect repositories to hosting platforms)
@@ -39,7 +39,8 @@ This section shows how to deploy the backend to Render. You can follow similar s
      - `NODE_ENV=production`
    - Ensure you create the `data/` directory or configure a persistent disk (see below)
 4. Database persistence
-   - SQLite persists to a local file. To keep data across deploys, configure a persistent disk or volume on your host (Render offers persistent disks on paid plans). If you don't have a persistent disk, the database will be ephemeral and lost when the service redeploys.
+   - This project now uses MongoDB (Atlas or self-hosted) as the primary data store. The legacy SQLite `data/` folder has been removed from the repository and is intentionally ignored by `.gitignore` to avoid accidental commits of binary DB files.
+   - If you previously relied on the SQLite file, migrate your data to MongoDB before removing local artifacts.
 5. Deploy and verify
    - Deploy the service and copy the public URL. Use this value as `BASE_URL` and for the frontend's `VITE_API_BASE`.
 

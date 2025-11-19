@@ -1,42 +1,74 @@
-const Database = require('better-sqlite3');
-const fs = require('fs');
-const path = require('path');
+const Link = require('./models/Link');
 
-const DB_PATH = process.env.DATABASE_FILE || path.join(__dirname, 'data', 'tinylink.db');
-const dir = path.dirname(DB_PATH);
-if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-
-const db = new Database(DB_PATH);
-
-db.prepare(`
-  CREATE TABLE IF NOT EXISTS links (
-    code TEXT PRIMARY KEY,
-    url TEXT NOT NULL,
-    clicks INTEGER DEFAULT 0,
-    last_clicked TEXT,
-    created_at TEXT NOT NULL
-  )
-`).run();
-
+/**
+ * Data access layer for Link documents.
+ * This module abstracts Mongoose operations and returns plain JS objects
+ * (where applicable) so the rest of the app doesn't need to depend on
+ * Mongoose document instances.
+ */
 module.exports = {
-  getAllLinks: () => {
-    return db.prepare(`SELECT code, url, clicks, last_clicked, created_at FROM links ORDER BY created_at DESC`).all();
+  /**
+   * Return all links sorted by creation date (newest first).
+   * Uses `.lean()` to return plain JavaScript objects instead of Mongoose documents.
+   * @returns {Promise<Array<Object>>}
+   */
+  getAllLinks: async () => {
+    // `.find().sort()` performs a query and sorts by created_at descending.
+    return await Link.find().sort({ created_at: -1 }).lean();
   },
-  getLink: (code) => {
-    return db.prepare(`SELECT code, url, clicks, last_clicked, created_at FROM links WHERE code = ?`).get(code);
+
+  /**
+   * Find a single link by code. Returns `null` when not found.
+   * @param {string} code
+   * @returns {Promise<Object|null>}
+   */
+  getLink: async (code) => {
+    // `.findOne()` returns a Mongoose document; `.lean()` converts to plain object.
+    return await Link.findOne({ code }).lean();
   },
-  createLink: ({ code, url }) => {
-    const now = new Date().toISOString();
-    return db.prepare(`INSERT INTO links (code, url, created_at) VALUES (?, ?, ?)`).run(code, url, now);
+
+  /**
+   * Create a new link document.
+   * Note: this will throw a MongoDB duplicate-key error (E11000) if `code` is not unique.
+   * The caller (route) should handle duplicate errors and map them to 409 responses.
+   * @param {{code: string, url: string}} param0
+   * @returns {Promise<Object>} created link object
+   */
+  createLink: async ({ code, url }) => {
+    const link = new Link({ code, url, created_at: new Date() });
+    // `save()` persists the document; it will throw on validation or unique index errors.
+    await link.save();
+    // `.toObject()` returns a plain object representation of the saved document.
+    return link.toObject();
   },
-  incrementClick: (code) => {
-    const now = new Date().toISOString();
-    return db.prepare(`UPDATE links SET clicks = clicks + 1, last_clicked = ? WHERE code = ?`).run(now, code);
+
+  /**
+   * Increment click counter and set the last_clicked timestamp atomically.
+   * Uses MongoDB update operators: `$inc` to increment and `$set` to update timestamp.
+   * @param {string} code
+   * @returns {Promise<Object>} update result
+   */
+  incrementClick: async (code) => {
+    return await Link.updateOne({ code }, { $inc: { clicks: 1 }, $set: { last_clicked: new Date() } });
   },
-  deleteLink: (code) => {
-    return db.prepare(`DELETE FROM links WHERE code = ?`).run(code);
+
+  /**
+   * Delete a link by its code.
+   * @param {string} code
+   * @returns {Promise<Object>} delete result
+   */
+  deleteLink: async (code) => {
+    return await Link.deleteOne({ code });
   },
-  codeExists: (code) => {
-    return !!db.prepare(`SELECT 1 FROM links WHERE code = ?`).get(code);
+
+  /**
+   * Efficiently check existence of a code by selecting only `_id`.
+   * This avoids transferring entire documents when only existence is required.
+   * @param {string} code
+   * @returns {Promise<boolean>}
+   */
+  codeExists: async (code) => {
+    const link = await Link.findOne({ code }).select('_id').lean();
+    return !!link;
   }
 };
