@@ -14,21 +14,15 @@ const BASE_URL = process.env.BASE_URL;
 const app = express();
 app.use(helmet());
 
-// Configure CORS origins.
-// If `ALLOWED_ORIGINS` is set (comma-separated) it takes precedence and will be
-// used to validate request origins. Otherwise `BASE_URL` is used as the allowed origin.
 const rawAllowed = process.env.ALLOWED_ORIGINS || process.env.BASE_URL || '';
 const allowedOrigins = rawAllowed.split(',').map(s => s.trim()).filter(Boolean);
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow non-browser requests (e.g., curl, Postman) where `origin` is undefined.
       if (!origin) return callback(null, true);
       if (allowedOrigins.length === 0) return callback(null, false);
-      // Accept the origin if it exactly matches one of the allowed origins.
       if (allowedOrigins.includes(origin)) return callback(null, true);
-      // Allow simple wildcard for vercel apps: permit any `*.vercel.app` if configured.
       if (allowedOrigins.some(a => a.startsWith('*.') && origin.endsWith(a.replace('*', '')))) return callback(null, true);
       return callback(new Error('Not allowed by CORS'));
     },
@@ -67,8 +61,7 @@ const distPath = path.join(__dirname, '../frontend/dist');
 if (process.env.NODE_ENV === 'production' && fs.existsSync(distPath)) {
   app.use(express.static(distPath));
 
-  // Redirect route — must be AFTER static middleware and API routes, but BEFORE
-  // the SPA catch-all. Use async handlers to await database operations.
+
   app.get('/:code', async (req, res) => {
     try {
       const code = req.params.code;
@@ -88,7 +81,6 @@ if (process.env.NODE_ENV === 'production' && fs.existsSync(distPath)) {
     res.sendFile(path.join(distPath, 'index.html'));
   });
 } else {
-  // In non-production (or if dist missing) still register redirect route.
   app.get('/:code', async (req, res) => {
     try {
       const code = req.params.code;
@@ -118,10 +110,8 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-// Start server after connecting to database
 (async () => {
   try {
-    // Fail fast on missing environment before attempting DB connection
     validateEnv();
     await connectDB();
   } catch (err) {

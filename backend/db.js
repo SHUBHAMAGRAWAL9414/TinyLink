@@ -13,7 +13,6 @@ module.exports = {
    * @returns {Promise<Array<Object>>}
    */
   getAllLinks: async () => {
-    // `.find().sort()` performs a query and sorts by created_at descending.
     return await Link.find().sort({ created_at: -1 }).lean();
   },
 
@@ -23,7 +22,6 @@ module.exports = {
    * @returns {Promise<Object|null>}
    */
   getLink: async (code) => {
-    // `.findOne()` returns a Mongoose document; `.lean()` converts to plain object.
     return await Link.findOne({ code }).lean();
   },
 
@@ -36,9 +34,7 @@ module.exports = {
    */
   createLink: async ({ code, url }) => {
     const link = new Link({ code, url, created_at: new Date() });
-    // `save()` persists the document; it will throw on validation or unique index errors.
     await link.save();
-    // `.toObject()` returns a plain object representation of the saved document.
     return link.toObject();
   },
 
